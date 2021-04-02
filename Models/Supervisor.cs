@@ -12,7 +12,7 @@ namespace EmployeeDocumentation.Models
         public int SupervisorID { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }
-        public int extension { get; set; }
+        public int Extension { get; set; }
 
         public ICollection<Employee> Employees { get; set; }
     }

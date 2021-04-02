@@ -21,6 +21,8 @@ namespace EmployeeDocumentation.Models
         public int EmployeeID { get; set; }
         public int SupervisorID { get; set; }
         public Category Category { get; set; }
+        public DateTime Date { get; set; }
+        public string Entry { get; set; }
 
         public Employee Employee { get; set; }
         public Supervisor Supervisor { get; set; }
