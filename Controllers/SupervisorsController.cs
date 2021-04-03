@@ -34,6 +34,9 @@ namespace EmployeeDocumentation.Controllers
             }
 
             var supervisor = await _context.Supervisors
+                .Include(e => e.Employees)
+                    .ThenInclude(e => e.Documentation)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.SupervisorID == id);
             if (supervisor == null)
             {
@@ -54,13 +57,23 @@ namespace EmployeeDocumentation.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SupervisorID,LastName,FirstName,Extension")] Supervisor supervisor)
+        public async Task<IActionResult> Create([Bind("LastName,FirstName,Extension")] Supervisor supervisor)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(supervisor);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(supervisor);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //Log the error (uncomment ex variable name and write a log.
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
             }
             return View(supervisor);
         }
