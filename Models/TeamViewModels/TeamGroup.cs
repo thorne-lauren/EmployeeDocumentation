@@ -6,9 +6,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EmployeeDocumentation.Models.TeamViewModels
 {
-    public class EmployeeGroup
+    public class TeamGroup
     {
         public int? SupervisorID { get; set; }
+        public Supervisor Supervisor { get; set; }
 
         public int EmployeeCount { get; set; }
     }

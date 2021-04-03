@@ -22,10 +22,10 @@ namespace EmployeeDocumentation.Controllers
 
         public async Task<ActionResult> About()
         {
-            IQueryable<EmployeeGroup> data =
+            IQueryable<TeamGroup> data =
                 from employee in _context.Employees
                 group employee by employee.SupervisorID into supervisorGroup
-                select new EmployeeGroup()
+                select new TeamGroup()
                 {
                     SupervisorID = supervisorGroup.Key,
                     EmployeeCount = supervisorGroup.Count()
