@@ -4,14 +4,16 @@ using EmployeeDocumentation.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EmployeeDocumentation.Migrations
 {
     [DbContext(typeof(TeamContext))]
-    partial class TeamContextModelSnapshot : ModelSnapshot
+    [Migration("20210403030007_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,8 +27,7 @@ namespace EmployeeDocumentation.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("AuthorInitials")
-                        .HasMaxLength(10);
+                    b.Property<string>("AuthorInitials");
 
                     b.Property<int>("Category");
 
@@ -49,14 +50,11 @@ namespace EmployeeDocumentation.Migrations
 
                     b.Property<int>("Extension");
 
-                    b.Property<string>("FirstName")
-                        .HasMaxLength(50);
+                    b.Property<string>("FirstName");
 
                     b.Property<DateTime>("HireDate");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50);
+                    b.Property<string>("LastName");
 
                     b.Property<int>("SupervisorID");
 
@@ -73,13 +71,9 @@ namespace EmployeeDocumentation.Migrations
 
                     b.Property<int>("Extension");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(50);
+                    b.Property<string>("FirstName");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50);
+                    b.Property<string>("LastName");
 
                     b.HasKey("SupervisorID");
 
