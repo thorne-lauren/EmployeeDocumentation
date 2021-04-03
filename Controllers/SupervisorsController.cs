@@ -20,9 +20,21 @@ namespace EmployeeDocumentation.Controllers
         }
 
         // GET: Supervisors
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
-            return View(await _context.Supervisors.ToListAsync());
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "lastname_desc" : "";
+            var supervisors = from s in _context.Supervisors
+                           select s;
+            switch (sortOrder)
+            {
+                case "lastname_desc":
+                    supervisors = supervisors.OrderByDescending(s => s.LastName);
+                    break;
+                default:
+                    supervisors = supervisors.OrderBy(s => s.LastName);
+                    break;
+            }
+            return View(await supervisors.AsNoTracking().ToListAsync());
         }
 
         // GET: Supervisors/Details/5
@@ -57,7 +69,7 @@ namespace EmployeeDocumentation.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LastName,FirstName,Extension")] Supervisor supervisor)
+        public async Task<IActionResult> Create([Bind("SupervisorID,LastName,FirstName,Extension")] Supervisor supervisor)
         {
             try
             {
@@ -97,40 +109,37 @@ namespace EmployeeDocumentation.Controllers
         // POST: Supervisors/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("SupervisorID,LastName,FirstName,Extension")] Supervisor supervisor)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            if (id != supervisor.SupervisorID)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            var supervisorToUpdate = await _context.Supervisors.FirstOrDefaultAsync(s => s.SupervisorID == id);
+            if (await TryUpdateModelAsync<Supervisor>(
+                supervisorToUpdate,
+                "",
+                s => s.LastName, s => s.FirstName, s => s.Extension))
             {
                 try
                 {
-                    _context.Update(supervisor);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!SupervisorExists(supervisor.SupervisorID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    //Log the error (uncomment ex variable name and write a log.)
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                        "Try again, and if the problem persists, " +
+                        "see your system administrator.");
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(supervisor);
+            return View(supervisorToUpdate);
         }
-
         // GET: Supervisors/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
         {
             if (id == null)
             {
@@ -138,10 +147,18 @@ namespace EmployeeDocumentation.Controllers
             }
 
             var supervisor = await _context.Supervisors
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.SupervisorID == id);
             if (supervisor == null)
             {
                 return NotFound();
+            }
+
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewData["ErrorMessage"] =
+                    "Delete failed. Try again, and if the problem persists " +
+                    "see your system administrator.";
             }
 
             return View(supervisor);
@@ -153,9 +170,21 @@ namespace EmployeeDocumentation.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var supervisor = await _context.Supervisors.FindAsync(id);
-            _context.Supervisors.Remove(supervisor);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            if (supervisor == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            try
+            {
+                _context.Supervisors.Remove(supervisor);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //Log the error (uncomment ex variable name and write a log.)
+                return RedirectToAction(nameof(Delete), new { id = id, saveChangesError = true });
+            }
         }
 
         private bool SupervisorExists(int id)
