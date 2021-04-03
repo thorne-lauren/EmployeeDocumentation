@@ -20,11 +20,33 @@ namespace EmployeeDocumentation.Controllers
         }
 
         // GET: Supervisors
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(
+            string sortOrder,
+            string currentFilter,
+            string searchString,
+            int? pageNumber)
         {
+            ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "lastname_desc" : "";
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
             var supervisors = from s in _context.Supervisors
                            select s;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                supervisors = supervisors.Where(s => s.LastName.Contains(searchString)
+                                       || s.FirstName.Contains(searchString));
+            }
             switch (sortOrder)
             {
                 case "lastname_desc":
@@ -34,7 +56,8 @@ namespace EmployeeDocumentation.Controllers
                     supervisors = supervisors.OrderBy(s => s.LastName);
                     break;
             }
-            return View(await supervisors.AsNoTracking().ToListAsync());
+            int pageSize = 3;
+            return View(await PaginatedList<Supervisor>.CreateAsync(supervisors.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Supervisors/Details/5

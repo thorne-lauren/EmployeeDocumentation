@@ -1,0 +1,30 @@
+﻿@model IEnumerable<EmployeeDocumentation.Models.TeamViewModels.EmployeeGroup>
+
+@{
+    ViewData["Title"] = "Team Statistics";
+}
+
+<h2>Team Statistics</h2>
+
+<table>
+    <tr>
+        <th>
+            Supervisor ID
+        </th>
+        <th>
+            Employee
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.SupervisorID)
+            </td>
+            <td>
+                @item.EmployeeCount
+            </td>
+        </tr>
+    }
+</table>
