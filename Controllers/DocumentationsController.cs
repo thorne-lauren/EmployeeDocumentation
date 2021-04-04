@@ -11,19 +11,19 @@ using EmployeeDocumentation.Models.TeamViewModels;
 
 namespace EmployeeDocumentation.Controllers
 {
-    public class DocumentationController : Controller
+    public class DocumentationsController : Controller
     {
         private readonly TeamContext _context;
 
-        public DocumentationController(TeamContext context)
+        public DocumentationsController(TeamContext context)
         {
             _context = context;
         }
 
-        // GET: Documentation
+        // GET: Documentations
         public async Task<IActionResult> Index()
         {
-            var documentation = _context.Documentation
+            var documentation = _context.Documentations
                 .Include(e => e.Employee)
                 .AsNoTracking();
             return View(await documentation.ToListAsync());
@@ -37,7 +37,7 @@ namespace EmployeeDocumentation.Controllers
                 return NotFound();
             }
 
-            var documentation = await _context.Documentation
+            var documentation = await _context.Documentations
                 .Include(d => d.Employee)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.DocumentationID == id);
@@ -81,7 +81,7 @@ namespace EmployeeDocumentation.Controllers
                 return NotFound();
             }
 
-            var documentation = await _context.Documentation
+            var documentation = await _context.Documentations
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.DocumentationID == id);
             if (documentation == null)
@@ -104,7 +104,7 @@ namespace EmployeeDocumentation.Controllers
                 return NotFound();
             }
 
-            var documentationToUpdate = await _context.Documentation
+            var documentationToUpdate = await _context.Documentations
                 .FirstOrDefaultAsync(d => d.DocumentationID == id);
 
             if (await TryUpdateModelAsync<Documentation>(documentationToUpdate,
@@ -145,7 +145,7 @@ namespace EmployeeDocumentation.Controllers
                 return NotFound();
             }
 
-            var documentation = await _context.Documentation
+            var documentation = await _context.Documentations
                 .Include(d => d.Employee)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.DocumentationID == id);
@@ -162,15 +162,15 @@ namespace EmployeeDocumentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var documentation = await _context.Documentation.FindAsync(id);
-            _context.Documentation.Remove(documentation);
+            var documentation = await _context.Documentations.FindAsync(id);
+            _context.Documentations.Remove(documentation);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool DocumentationExists(int id)
         {
-            return _context.Documentation.Any(e => e.DocumentationID == id);
+            return _context.Documentations.Any(e => e.DocumentationID == id);
         }
     }
 }

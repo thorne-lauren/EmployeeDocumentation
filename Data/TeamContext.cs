@@ -14,7 +14,7 @@ namespace EmployeeDocumentation.Data
         }
 
         public DbSet<Supervisor> Supervisors { get; set; }
-        public DbSet<Documentation> Documentation { get; set; }
+        public DbSet<Documentation> Documentations { get; set; }
         public DbSet<Employee> Employees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

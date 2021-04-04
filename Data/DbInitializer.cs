@@ -59,7 +59,7 @@ namespace EmployeeDocumentation.Data
             };
             foreach (Documentation d in documentation)
             {
-                context.Documentation.Add(d);
+                context.Documentations.Add(d);
             }
 
             context.SaveChanges();

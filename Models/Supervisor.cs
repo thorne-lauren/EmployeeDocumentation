@@ -28,6 +28,6 @@ namespace EmployeeDocumentation.Models
             get { return LastName + ", " + FirstName; }
         }
 
-        public ICollection<Employee> Employees { get; set; }
+        public ICollection<Employee>? Employees { get; set; }
     }
 }

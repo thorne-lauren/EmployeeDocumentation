@@ -70,7 +70,6 @@ namespace EmployeeDocumentation.Controllers
 
             var supervisor = await _context.Supervisors
                 .Include(e => e.Employees)
-                    .ThenInclude(e => e.Documentation)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.SupervisorID == id);
             if (supervisor == null)

@@ -35,11 +35,17 @@ namespace EmployeeDocumentation.Controllers
             {
                 return NotFound();
             }
+            /*var documentation = await _context.Employees
+                .Include(d => d.Documentations)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.EmployeeID == id);*/
 
             var employee = await _context.Employees
                 .Include(s => s.Supervisor)
+                .Include(d => d.Documentations)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.EmployeeID == id);
+
             if (employee == null)
             {
                 return NotFound();

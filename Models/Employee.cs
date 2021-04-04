@@ -24,8 +24,8 @@ namespace EmployeeDocumentation.Models
         [Display(Name = "Hire Date")]
         public DateTime HireDate { get; set; }
         public int Extension { get; set; }
-        public int SupervisorID { get; set; }
-        public Supervisor Supervisor { get; set; }
+        public int? SupervisorID { get; set; }
+        public Supervisor? Supervisor { get; set; }
         [Display(Name = "Full Name")]
         public string FullName
         {
@@ -35,6 +35,7 @@ namespace EmployeeDocumentation.Models
             }
         }
 
-        public ICollection<Documentation> Documentation { get; set; }
+        public ICollection<Documentation>? Documentations { get; set; }
+
     }
 }

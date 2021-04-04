@@ -46,6 +46,36 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Supervisor.FullName)
         </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Documentations)
+        </dt>
+        <dd class="col-sm-10">
+            <table class="table">
+                <tr>
+                    <th>Author Initials</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Entry</th>
+                </tr>
+                @foreach (var item in Model.Documentations)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AuthorInitials)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Category)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Date)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Entry)
+                        </td>
+                    </tr>
+                }
+            </table>
+        </dd>
     </dl>
 </div>
 <div>
