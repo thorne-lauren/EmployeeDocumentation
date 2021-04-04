@@ -63,11 +63,21 @@ namespace EmployeeDocumentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("DocumentationID,EmployeeID,AuthorInitials,Category,Date,Entry")] Documentation documentation)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(documentation);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(documentation);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //Log the error (uncomment ex variable name and write a log.
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
             }
             PopulateEmployeesDropDownList(documentation.EmployeeID);
             return View(documentation);
@@ -138,7 +148,7 @@ namespace EmployeeDocumentation.Controllers
         }
 
         // GET: Documentation/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
         {
             if (id == null)
             {
@@ -153,6 +163,12 @@ namespace EmployeeDocumentation.Controllers
             {
                 return NotFound();
             }
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewData["ErrorMessage"] =
+                    "Delete failed. Try again, and if the problem persists " +
+                    "see your system administrator.";
+            }
 
             return View(documentation);
         }
@@ -163,9 +179,22 @@ namespace EmployeeDocumentation.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var documentation = await _context.Documentations.FindAsync(id);
-            _context.Documentations.Remove(documentation);
+            if (documentation == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                _context.Documentations.Remove(documentation);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //Log the error (uncomment ex variable name and write a log.)
+                return RedirectToAction(nameof(Delete), new { id = id, saveChangesError = true });
+            }
         }
 
         private bool DocumentationExists(int id)

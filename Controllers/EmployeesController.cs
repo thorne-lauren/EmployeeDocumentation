@@ -68,11 +68,21 @@ namespace EmployeeDocumentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EmployeeID,LastName,FirstName,HireDate,Extension,SupervisorID")] Employee employee)
         {
-            if (ModelState.IsValid)
+            try
+            {
+                if (ModelState.IsValid)
             {
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+            }
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //Log the error (uncomment ex variable name and write a log.
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
             }
             PopulateSupervisorsDropDownList(employee.SupervisorID);
             return View(employee);
@@ -143,7 +153,7 @@ namespace EmployeeDocumentation.Controllers
         }
 
         // GET: Employees/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
         {
             if (id == null)
             {
@@ -158,6 +168,12 @@ namespace EmployeeDocumentation.Controllers
             {
                 return NotFound();
             }
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewData["ErrorMessage"] =
+                    "Delete failed. Try again, and if the problem persists " +
+                    "see your system administrator.";
+            }
 
             return View(employee);
         }
@@ -168,9 +184,21 @@ namespace EmployeeDocumentation.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var employee = await _context.Employees.FindAsync(id);
-            _context.Employees.Remove(employee);
+            if (employee == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            try
+            {
+                _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //Log the error (uncomment ex variable name and write a log.)
+                return RedirectToAction(nameof(Delete), new { id = id, saveChangesError = true });
+            }
         }
 
         private bool EmployeeExists(int id)
