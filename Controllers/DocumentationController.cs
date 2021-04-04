@@ -39,6 +39,7 @@ namespace EmployeeDocumentation.Controllers
 
             var documentation = await _context.Documentation
                 .Include(d => d.Employee)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.DocumentationID == id);
             if (documentation == null)
             {
@@ -51,7 +52,7 @@ namespace EmployeeDocumentation.Controllers
         // GET: Documentation/Create
         public IActionResult Create()
         {
-            ViewData["EmployeeID"] = new SelectList(_context.Employees, "EmployeeID", "LastName");
+            PopulateEmployeesDropDownList();
             return View();
         }
 
@@ -68,7 +69,7 @@ namespace EmployeeDocumentation.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EmployeeID"] = new SelectList(_context.Employees, "EmployeeID", "LastName", documentation.EmployeeID);
+            PopulateEmployeesDropDownList(documentation.EmployeeID);
             return View(documentation);
         }
 
@@ -80,49 +81,60 @@ namespace EmployeeDocumentation.Controllers
                 return NotFound();
             }
 
-            var documentation = await _context.Documentation.FindAsync(id);
+            var documentation = await _context.Documentation
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.DocumentationID == id);
             if (documentation == null)
             {
                 return NotFound();
             }
-            ViewData["EmployeeID"] = new SelectList(_context.Employees, "EmployeeID", "LastName", documentation.EmployeeID);
+            PopulateEmployeesDropDownList(documentation.EmployeeID);
             return View(documentation);
         }
 
         // POST: Documentation/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DocumentationID,EmployeeID,AuthorInitials,Category,Date,Entry")] Documentation documentation)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            if (id != documentation.DocumentationID)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var documentationToUpdate = await _context.Documentation
+                .FirstOrDefaultAsync(d => d.DocumentationID == id);
+
+            if (await TryUpdateModelAsync<Documentation>(documentationToUpdate,
+                "",
+                d => d.EmployeeID, d => d.AuthorInitials, d => d.Category, d => d.Date, d => d.Entry))
             {
                 try
                 {
-                    _context.Update(documentation);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!DocumentationExists(documentation.DocumentationID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    //Log the error (uncomment ex variable name and write a log.)
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                        "Try again, and if the problem persists, " +
+                        "see your system administrator.");
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EmployeeID"] = new SelectList(_context.Employees, "EmployeeID", "LastName", documentation.EmployeeID);
-            return View(documentation);
+            PopulateEmployeesDropDownList(documentationToUpdate.EmployeeID);
+            return View(documentationToUpdate);
+        }
+
+        // Loads employee dropdown
+        private void PopulateEmployeesDropDownList(object selectedEmployee = null)
+        {
+            var employeesQuery = from e in _context.Employees
+                                   orderby e.FullName
+                                   select e;
+            ViewBag.EmployeeID = new SelectList(employeesQuery.AsNoTracking(), "EmployeeID", "FullName", selectedEmployee);
         }
 
         // GET: Documentation/Delete/5
@@ -135,6 +147,7 @@ namespace EmployeeDocumentation.Controllers
 
             var documentation = await _context.Documentation
                 .Include(d => d.Employee)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.DocumentationID == id);
             if (documentation == null)
             {
