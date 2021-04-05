@@ -31,8 +31,6 @@ namespace EmployeeDocumentation.Controllers
             ViewData["FirstNameSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "firstname" ? "firstname" : "firstname_desc";
             ViewData["SupervisorSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "supervisor" ? "supervisor" : "supervisor_desc";
 
-            //var employeeSort = from e in _context.Employees
-            //                   select e;
             switch (sortOrder)
             {
                 case "lastname":

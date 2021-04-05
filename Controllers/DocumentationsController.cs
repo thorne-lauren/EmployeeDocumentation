@@ -21,11 +21,49 @@ namespace EmployeeDocumentation.Controllers
         }
 
         // GET: Documentations
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
             var documentation = _context.Documentations
                 .Include(e => e.Employee)
                 .AsNoTracking();
+
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["EmployeeSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "employee" ? "employee" : "employee_desc";
+            ViewData["AuthorInitialsSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "authorinitials" ? "authorinitials" : "authorinitials_desc";
+            ViewData["DateSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "Date" ? "Date" : "date_desc";
+            ViewData["CategorySortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "category" ? "category" : "category_desc";
+
+            switch (sortOrder)
+            {
+                case "employee":
+                    documentation = documentation.OrderBy(d => d.Employee.FullName);
+                    break;
+                case "employee_desc":
+                    documentation = documentation.OrderByDescending(d => d.Employee.FullName);
+                    break;
+                case "authorinitials":
+                    documentation = documentation.OrderBy(d => d.AuthorInitials);
+                    break;
+                case "authorinitials_desc":
+                    documentation = documentation.OrderByDescending(d => d.AuthorInitials);
+                    break;
+                case "Date":
+                    documentation = documentation.OrderBy(d => d.Date);
+                    break;
+                case "date_desc":
+                    documentation = documentation.OrderByDescending(d => d.Date);
+                    break;
+                case "category":
+                    documentation = documentation.OrderBy(d => d.Category);
+                    break;
+                case "category_desc":
+                    documentation = documentation.OrderByDescending(d => d.Category);
+                    break;
+                default:
+                    documentation = documentation.OrderBy(d => d.Date);
+                    break;
+            }
+
             return View(await documentation.ToListAsync());
         }
 
