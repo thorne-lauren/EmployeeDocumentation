@@ -79,7 +79,7 @@ namespace EmployeeDocumentation.Controllers
                     documentation = documentation.OrderByDescending(d => d.Category);
                     break;
                 default:
-                    documentation = documentation.OrderBy(d => d.Date);
+                    documentation = documentation.OrderByDescending(d => d.Date);
                     break;
             }
 
