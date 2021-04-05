@@ -20,7 +20,11 @@ namespace EmployeeDocumentation.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index(string sortOrder, string searchString)
+        public async Task<IActionResult> Index(
+            string sortOrder,
+            string currentFilter,
+            string searchString,
+            int? pageNumber)
         {
             var employees = _context.Employees
                 .Include(s => s.Supervisor)
@@ -31,6 +35,15 @@ namespace EmployeeDocumentation.Controllers
             ViewData["FirstNameSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "firstname" ? "firstname" : "firstname_desc";
             ViewData["SupervisorSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "supervisor" ? "supervisor" : "supervisor_desc";
             ViewData["CurrentFilter"] = searchString;
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
 
             if (!String.IsNullOrEmpty(searchString))
             {
@@ -63,7 +76,8 @@ namespace EmployeeDocumentation.Controllers
                     break;
             }
 
-            return View(await employees.AsNoTracking().ToListAsync());
+            int pageSize = 20;
+            return View(await PaginatedList<Employee>.CreateAsync(employees.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Employees/Details/5

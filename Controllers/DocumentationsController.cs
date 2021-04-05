@@ -21,7 +21,11 @@ namespace EmployeeDocumentation.Controllers
         }
 
         // GET: Documentations
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(
+            string sortOrder,
+            string currentFilter,
+            string searchString,
+            int? pageNumber)
         {
             var documentation = _context.Documentations
                 .Include(e => e.Employee)
@@ -32,6 +36,12 @@ namespace EmployeeDocumentation.Controllers
             ViewData["AuthorInitialsSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "authorinitials" ? "authorinitials" : "authorinitials_desc";
             ViewData["DateSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "Date" ? "Date" : "date_desc";
             ViewData["CategorySortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "category" ? "category" : "category_desc";
+            ViewData["CurrentFilter"] = searchString;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                documentation = documentation.Where(d => d.Entry.Contains(searchString));
+            }
 
             switch (sortOrder)
             {
