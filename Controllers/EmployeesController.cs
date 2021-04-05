@@ -20,7 +20,7 @@ namespace EmployeeDocumentation.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
             var employees = _context.Employees
                 .Include(s => s.Supervisor)
@@ -30,6 +30,13 @@ namespace EmployeeDocumentation.Controllers
             ViewData["LastNameSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "lastname" ? "lastname" : "lastname_desc";
             ViewData["FirstNameSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "firstname" ? "firstname" : "firstname_desc";
             ViewData["SupervisorSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "supervisor" ? "supervisor" : "supervisor_desc";
+            ViewData["CurrentFilter"] = searchString;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                employees = employees.Where(e => e.LastName.Contains(searchString)
+                                       || e.FirstName.Contains(searchString));
+            }
 
             switch (sortOrder)
             {
