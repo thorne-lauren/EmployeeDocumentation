@@ -27,7 +27,8 @@ namespace EmployeeDocumentation.Controllers
             int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "lastname_desc" : "";
+            ViewData["LastNameSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "lastname" ? "lastname" : "lastname_desc";
+            ViewData["FirstNameSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "firstname" ? "firstname" : "firstname_desc";
 
             if (searchString != null)
             {
@@ -49,14 +50,23 @@ namespace EmployeeDocumentation.Controllers
             }
             switch (sortOrder)
             {
+                case "lastname":
+                    supervisors = supervisors.OrderBy(s => s.LastName);
+                    break;
                 case "lastname_desc":
                     supervisors = supervisors.OrderByDescending(s => s.LastName);
+                    break;
+                case "firstname":
+                    supervisors = supervisors.OrderBy(s => s.FirstName);
+                    break;
+                case "firstname_desc":
+                    supervisors = supervisors.OrderByDescending(s => s.FirstName);
                     break;
                 default:
                     supervisors = supervisors.OrderBy(s => s.LastName);
                     break;
             }
-            int pageSize = 3;
+            int pageSize = 20;
             return View(await PaginatedList<Supervisor>.CreateAsync(supervisors.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 

@@ -1,10 +1,10 @@
 ﻿@model PaginatedList<EmployeeDocumentation.Models.Supervisor>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Supervisors";
 }
 
-<h1>Index</h1>
+<h1>Supervisors</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -24,10 +24,10 @@
     <thead>
         <tr>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Last Name</a>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["LastNameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Last Name</a>
             </th>
             <th>
-                First Name
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["FirstNameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">First Name</a>
             </th>
             <th>
                 Extension

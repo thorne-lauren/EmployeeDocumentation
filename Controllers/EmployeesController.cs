@@ -20,12 +20,45 @@ namespace EmployeeDocumentation.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
             var employees = _context.Employees
                 .Include(s => s.Supervisor)
                 .AsNoTracking();
-            return View(await employees.ToListAsync());
+
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["LastNameSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "lastname" ? "lastname" : "lastname_desc";
+            ViewData["FirstNameSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "firstname" ? "firstname" : "firstname_desc";
+            ViewData["SupervisorSortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "supervisor" ? "supervisor" : "supervisor_desc";
+
+            //var employeeSort = from e in _context.Employees
+            //                   select e;
+            switch (sortOrder)
+            {
+                case "lastname":
+                    employees = employees.OrderBy(s => s.LastName);
+                    break;
+                case "lastname_desc":
+                    employees = employees.OrderByDescending(s => s.LastName);
+                    break;
+                case "firstname":
+                    employees = employees.OrderBy(s => s.FirstName);
+                    break;
+                case "firstname_desc":
+                    employees = employees.OrderByDescending(s => s.FirstName);
+                    break;
+                case "supervisor":
+                    employees = employees.OrderBy(s => s.Supervisor);
+                    break;
+                case "supervisor_desc":
+                    employees = employees.OrderByDescending(s => s.Supervisor);
+                    break;
+                default:
+                    employees = employees.OrderBy(s => s.LastName);
+                    break;
+            }
+
+            return View(await employees.AsNoTracking().ToListAsync());
         }
 
         // GET: Employees/Details/5
@@ -35,10 +68,6 @@ namespace EmployeeDocumentation.Controllers
             {
                 return NotFound();
             }
-            /*var documentation = await _context.Employees
-                .Include(d => d.Documentations)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.EmployeeID == id);*/
 
             var employee = await _context.Employees
                 .Include(s => s.Supervisor)

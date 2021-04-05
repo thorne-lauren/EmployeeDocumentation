@@ -16,10 +16,10 @@
                 @Html.DisplayNameFor(model => model.EmployeeID)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["LastNameSortParm"]">@Html.DisplayNameFor(model => model.LastName)</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["FirstNameSortParm"]">@Html.DisplayNameFor(model => model.FirstName)</a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.HireDate)
@@ -28,38 +28,41 @@
                 @Html.DisplayNameFor(model => model.Extension)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Supervisor)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["SupervisorSortParm"]">@Html.DisplayNameFor(model => model.Supervisor)</a>
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.EmployeeID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HireDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Extension)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Supervisor.FullName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.EmployeeID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.EmployeeID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.EmployeeID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmployeeID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HireDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Extension)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Supervisor.FullName)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.EmployeeID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.EmployeeID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.EmployeeID">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+
