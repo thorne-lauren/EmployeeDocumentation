@@ -38,6 +38,15 @@ namespace EmployeeDocumentation.Controllers
             ViewData["CategorySortParm"] = String.IsNullOrEmpty(sortOrder) || sortOrder != "category" ? "category" : "category_desc";
             ViewData["CurrentFilter"] = searchString;
 
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
             if (!String.IsNullOrEmpty(searchString))
             {
                 documentation = documentation.Where(d => d.Entry.Contains(searchString));
@@ -74,7 +83,8 @@ namespace EmployeeDocumentation.Controllers
                     break;
             }
 
-            return View(await documentation.ToListAsync());
+            int pageSize = 10;
+            return View(await PaginatedList<Documentation>.CreateAsync(documentation.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Documentation/Details/5
